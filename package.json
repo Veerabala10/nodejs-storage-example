@@ -21,7 +21,8 @@
   "homepage": "https://github.com/0xPolygonID/nodejs-storage-example#readme",
   "dependencies": {
     "@0xpolygonid/js-sdk": "^1.2.0",
-    "mongodb": "^6.1.0"
+    "mongodb": "^6.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@iden3/eslint-config": "https://github.com/iden3/eslint-config",
@@ -29,12 +30,14 @@
     "@types/chai-as-promised": "^7.1.5",
     "@types/chai-spies": "^1.0.4",
     "@types/mocha": "^10.0.2",
-    "mocha": "10.2.0",
+    "@types/uuid": "^9.0.4",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "chai-spies": "^1.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "10.2.0",
+    "mongodb-memory-server": "^8.16.0",
     "prettier": "^2.7.1",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",

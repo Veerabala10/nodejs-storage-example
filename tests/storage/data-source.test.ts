@@ -2,12 +2,14 @@ import { Profile } from '@0xpolygonid/js-sdk';
 import { expect } from 'chai';
 import { MongoDataSource } from '../../src/storage/data-source';
 import { DbConnectionOptions, MongoDataSourceFactory } from '../../src/storage/data-source-factory';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 describe('Test MongoDB Data Source', () => {
   let dbSource: MongoDataSource<Profile>;
   beforeEach(async () => {
+    const mongod = await MongoMemoryServer.create();
     const connection: DbConnectionOptions = {
-      url: 'mongodb://localhost:27017',
+      url: mongod.getUri(),
       dbName: 'mongodb-sdk-example',
       collection: 'test'
     };
