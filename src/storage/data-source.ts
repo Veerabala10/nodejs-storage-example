@@ -45,7 +45,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
     const filter = {
       [keyName]: key
     } as Filter<Type>;
-    return (await this._collection.findOne(filter) ?? undefined) as Type | undefined;
+    return ((await this._collection.findOne(filter)) ?? undefined) as Type | undefined;
   }
 
   /**

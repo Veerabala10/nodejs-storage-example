@@ -1,7 +1,11 @@
 import { IndexedDBStorage, Merkletree, str2Bytes } from '@iden3/js-merkletree';
 import * as uuid from 'uuid';
 
-import { IdentityMerkleTreeMetaInformation, IMerkleTreeStorage, MerkleTreeType, Profile } from '@0xpolygonid/js-sdk';
+import {
+  IdentityMerkleTreeMetaInformation,
+  IMerkleTreeStorage,
+  MerkleTreeType
+} from '@0xpolygonid/js-sdk';
 import { MongoDataSource } from './data-source';
 
 export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
@@ -18,17 +22,17 @@ export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
  * @implements implements IMerkleTreeStorage interface
  */
 export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
-
   /**
    * Creates an instance of MerkleTreeIndexedDBStorage.
    * @param {number} _mtDepth
    * @param {MongoDataSource<any>} _merkleTreeMetaStore
    * @param {MongoDataSource<any>} _bindingStore
    */
-  constructor(private readonly _mtDepth: number, 
+  constructor(
+    private readonly _mtDepth: number,
     private readonly _merkleTreeMetaStore: MongoDataSource<any>,
-    private readonly _bindingStore: MongoDataSource<any>) {
-  }
+    private readonly _bindingStore: MongoDataSource<any>
+  ) {}
 
   /** creates a tree in the indexed db storage */
   async createIdentityMerkleTrees(
@@ -44,17 +48,15 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       );
     }
 
-    const createMerkleTreeMetaInfo = (
-        identifier: string
-        )   : IdentityMerkleTreeMetaInformation[] => {
-            const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
-            for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
-                const mType = MERKLE_TREE_TYPES[index];
-                const treeId = `${identifier}+${mType}`;
-                treesMeta.push({ treeId, identifier, type: mType });
-            }
-            return treesMeta;
-        };
+    const createMerkleTreeMetaInfo = (identifier: string): IdentityMerkleTreeMetaInformation[] => {
+      const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
+      for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
+        const mType = MERKLE_TREE_TYPES[index];
+        const treeId = `${identifier}+${mType}`;
+        treesMeta.push({ treeId, identifier, type: mType });
+      }
+      return treesMeta;
+    };
 
     const treesMeta = createMerkleTreeMetaInfo(identifier);
     await this._merkleTreeMetaStore.save(identifier, treesMeta);

@@ -1,19 +1,18 @@
 import { Profile } from '@0xpolygonid/js-sdk';
 import { expect } from 'chai';
 import { MongoDataSource } from '../../src/storage/data-source';
-import { DbConnectionOptions, MongoDataSourceFactory } from '../../src/storage/data-source-factory';
+import { MongoDataSourceFactory } from '../../src/storage/data-source-factory';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 describe('Test MongoDB Data Source', () => {
   let dbSource: MongoDataSource<Profile>;
   beforeEach(async () => {
     const mongod = await MongoMemoryServer.create();
-    const connection: DbConnectionOptions = {
-      url: mongod.getUri(),
-      dbName: 'mongodb-sdk-example',
-      collection: 'test'
-    };
-    dbSource = await MongoDataSourceFactory(connection);
+    dbSource = await MongoDataSourceFactory(
+      mongod.getUri(),
+      'mongodb-sdk-example',
+      'test-collection'
+    );
   });
 
   it('Test all operations', async () => {
@@ -45,5 +44,4 @@ describe('Test MongoDB Data Source', () => {
     profileFind = await dbSource.get(keyVal);
     expect(profileFind).to.be.undefined;
   });
-
 });

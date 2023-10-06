@@ -2,23 +2,16 @@ import { MongoClient, Document } from 'mongodb';
 import { MongoDataSource } from './data-source';
 
 /**
- * Mongo DB connection options
- */
-export class DbConnectionOptions {
-  url!: string;
-  dbName!: string;
-  collection!: string;
-}
-
-/**
  * Returns instance of Mongo Data Source
  */
 export const MongoDataSourceFactory = async <Type extends Document>(
-  connection: DbConnectionOptions
+  url: string,
+  dbName: string,
+  collection: string
 ) => {
-  const client = new MongoClient(connection.url);
+  const client = new MongoClient(url);
   await client.connect();
-  const db = client.db(connection.dbName);
-  const collection = db.collection<Type>(connection.collection);
-  return new MongoDataSource<Type>(collection);
+  const db = client.db(dbName);
+  const collectionInstance = db.collection<Type>(collection);
+  return new MongoDataSource<Type>(collectionInstance);
 };
