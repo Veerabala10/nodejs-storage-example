@@ -39,7 +39,8 @@ describe('Test MerkleTreeMongodDBStorage', () => {
       mt: new MerkleTreeMongodDBStorage(
         40,
         await MongoDataSourceFactory<any>(url, dbName, 'polygonid_metastore'),
-        await MongoDataSourceFactory<any>(url, dbName, 'polygonid_binding_store')
+        await MongoDataSourceFactory<any>(url, dbName, 'polygonid_binding_store'),
+        url
       ),
       states: new EthStateStorage(ethConfig)
     };

@@ -7,9 +7,9 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 describe('Test MongoDB Data Source', () => {
   let dbSource: MongoDataSource<Profile>;
   beforeEach(async () => {
-    const mongod = await MongoMemoryServer.create();
+    const mongodb = await MongoMemoryServer.create();
     dbSource = await MongoDataSourceFactory(
-      mongod.getUri(),
+      mongodb.getUri(),
       'mongodb-sdk-example',
       'test-collection'
     );

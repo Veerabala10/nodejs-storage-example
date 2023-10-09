@@ -1,4 +1,4 @@
-import { IndexedDBStorage, Merkletree, str2Bytes } from '@iden3/js-merkletree';
+import { Merkletree, str2Bytes } from '@iden3/js-merkletree';
 import * as uuid from 'uuid';
 
 import {
@@ -7,6 +7,7 @@ import {
   MerkleTreeType
 } from '@0xpolygonid/js-sdk';
 import { MongoDataSource } from './data-source';
+import { MongoDBStorageFactory } from './data-source-factory';
 
 export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
   MerkleTreeType.Claims,
@@ -31,7 +32,8 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
   constructor(
     private readonly _mtDepth: number,
     private readonly _merkleTreeMetaStore: MongoDataSource<any>,
-    private readonly _bindingStore: MongoDataSource<any>
+    private readonly _bindingStore: MongoDataSource<any>,
+    private readonly _treeStorageMongoConnectionURL: string
   ) {}
 
   /** creates a tree in the indexed db storage */
@@ -96,7 +98,12 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     if (!resultMeta) {
       throw err;
     }
-    return new Merkletree(new IndexedDBStorage(str2Bytes(resultMeta.treeId)), true, this._mtDepth);
+
+    const mongoDBTreeStorage = await MongoDBStorageFactory(
+      str2Bytes(resultMeta.treeId),
+      this._treeStorageMongoConnectionURL
+    );
+    return new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
   }
   /** adds to merkle tree in the mongo db storage */
   async addToMerkleTree(
@@ -117,11 +124,11 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       throw new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
     }
 
-    const tree = new Merkletree(
-      new IndexedDBStorage(str2Bytes(resultMeta.treeId)),
-      true,
-      this._mtDepth
+    const mongoDBTreeStorage = await MongoDBStorageFactory(
+      str2Bytes(resultMeta.treeId),
+      this._treeStorageMongoConnectionURL
     );
+    const tree = new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
 
     await tree.add(hindex, hvalue);
   }

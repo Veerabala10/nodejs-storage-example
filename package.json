@@ -21,6 +21,7 @@
   "homepage": "https://github.com/0xPolygonID/nodejs-storage-example#readme",
   "dependencies": {
     "@0xpolygonid/js-sdk": "^1.2.0",
+    "@iden3/js-merkletree": "^1.0.1",
     "mongodb": "^6.1.0",
     "uuid": "^9.0.1"
   },
