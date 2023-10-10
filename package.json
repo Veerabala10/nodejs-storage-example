@@ -1,14 +1,20 @@
 {
-  "name": "storage-example",
-  "version": "1.0.0",
+  "name": "@0xpolygonid/mongo-storage",
+  "version": "0.0.4",
   "description": "nodejs storage example",
-  "main": "index.js",
+  "main": "dist/cjs/index.js",
   "scripts": {
-    "build": "npm run clean && npm run build:esm && npm run build:umd && npm run build:esm:esbuild && npm run build:tsc",
+    "build": "npm run clean &&  npm run build:tsc",
     "test": "mocha",
+    "build:tsc": "tsc --module commonjs",
     "lint": "eslint --fix --ext .js,.ts src/**",
+    "clean": "rimraf ./dist",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
   },
+  "typings": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/0xPolygonID/nodejs-storage-example.git"
