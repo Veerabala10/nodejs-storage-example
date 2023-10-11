@@ -61,7 +61,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     };
 
     const treesMeta = createMerkleTreeMetaInfo(identifier);
-    await this._merkleTreeMetaStore.save(identifier, treesMeta);
+    await this._merkleTreeMetaStore.save(identifier, JSON.stringify(treesMeta));
     return treesMeta;
   }
   /**
@@ -75,7 +75,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
   ): Promise<IdentityMerkleTreeMetaInformation[]> {
     const meta = await this._merkleTreeMetaStore.get(identifier);
     if (meta) {
-      return meta;
+      return JSON.parse(meta);
     }
     throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
   }
@@ -85,11 +85,13 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     identifier: string,
     mtType: MerkleTreeType
   ): Promise<Merkletree> {
-    const meta = await this._merkleTreeMetaStore.get(identifier);
+    let meta = await this._merkleTreeMetaStore.get(identifier);
     const err = new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
     if (!meta) {
       throw err;
     }
+
+    meta = JSON.parse(meta);
 
     const resultMeta = meta.find(
       (m: { identifier: string; type: MerkleTreeType }) =>
@@ -112,10 +114,11 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     hindex: bigint,
     hvalue: bigint
   ): Promise<void> {
-    const meta = await this._merkleTreeMetaStore.get(identifier);
+    let meta = await this._merkleTreeMetaStore.get(identifier);
     if (!meta) {
       throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
     }
+    meta = JSON.parse(meta);
     const resultMeta = meta.find(
       (m: { identifier: string; type: MerkleTreeType }) =>
         m.identifier === identifier && m.type === mtType
@@ -135,10 +138,12 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
 
   /** binds merkle tree in the mongo db storage to the new identifiers */
   async bindMerkleTreeToNewIdentifier(oldIdentifier: string, newIdentifier: string): Promise<void> {
-    const meta = await this._merkleTreeMetaStore.get(oldIdentifier);
+    let meta = await this._merkleTreeMetaStore.get(oldIdentifier);
     if (!meta || !meta?.length) {
       throw new Error(`Merkle tree meta not found for identifier ${oldIdentifier}`);
     }
+
+    meta = JSON.parse(meta);
 
     const treesMeta = meta.map((m: { identifier: string; type: MerkleTreeType }) => ({
       ...m,
