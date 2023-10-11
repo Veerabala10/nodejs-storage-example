@@ -110,6 +110,7 @@ class MerkleTreeMongodDBStorage {
         if (!meta) {
             throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
         }
+        console.log('addToMerkleTree:' + meta);
         meta = JSON.parse(meta);
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
