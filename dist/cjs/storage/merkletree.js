@@ -132,7 +132,8 @@ class MerkleTreeMongodDBStorage {
             identifier: newIdentifier
         }));
         await this._merkleTreeMetaStore.delete(oldIdentifier);
-        await this._merkleTreeMetaStore.save(newIdentifier, treesMeta);
+        console.log('bindMerkleTreeToNewIdentifier: ' + JSON.stringify(treesMeta));
+        await this._merkleTreeMetaStore.save(newIdentifier, JSON.stringify(treesMeta));
         await this._bindingStore.save(oldIdentifier, newIdentifier);
     }
 }
