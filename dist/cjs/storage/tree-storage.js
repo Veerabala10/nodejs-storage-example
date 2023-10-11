@@ -54,17 +54,20 @@ class MongoDBStorage {
         if (!__classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f").equals(js_merkletree_1.ZERO_HASH)) {
             return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
         }
-        const root = await this._collection.findOne({ key: this._prefixHash });
+        let root = (await this._collection.findOne({ key: this._prefixHash }))?.value;
         if (!root) {
             __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, js_merkletree_1.ZERO_HASH, "f");
         }
         else {
+            root = JSON.parse(root);
+            // console.log(root);
             let bytes = root.bytes ? Object.values(root.bytes) : root.bytes;
             __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, new js_merkletree_1.Hash(bytes), "f");
         }
         return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
     }
     async setRoot(r) {
+        // console.log('set' + JSON.stringify(r) );
         await this._collection.insertOne({ key: this._prefixHash, value: JSON.stringify(r) });
         __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, r, "f");
     }
