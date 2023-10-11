@@ -27,11 +27,8 @@ class MongoDBStorage {
         const rootStr = await _collection.findOne({ key: prefixHash });
         let currentRoot;
         if (rootStr) {
-            console.log('setup:::::::::' + JSON.stringify(rootStr));
             const value = JSON.parse(rootStr.value);
-            console.log('setup::::::::: ss' + JSON.stringify(value.bytes));
             currentRoot = new js_merkletree_1.Hash(Uint8Array.from(Object.values(value.bytes)));
-            console.log('setup current root ********* ' + JSON.stringify(currentRoot));
         }
         else {
             currentRoot = js_merkletree_1.ZERO_HASH;
@@ -68,18 +65,6 @@ class MongoDBStorage {
         await this._collection.insertOne({ key: key, value: JSON.stringify(n) });
     }
     async getRoot() {
-        if (!__classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f").equals(js_merkletree_1.ZERO_HASH)) {
-            return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
-        }
-        let root = (await this._collection.findOne({ key: this._prefixHash }))?.value;
-        if (!root) {
-            __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, js_merkletree_1.ZERO_HASH, "f");
-        }
-        else {
-            root = JSON.parse(root);
-            let bytes = root.bytes ? Object.values(root.bytes) : root.bytes;
-            __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, new js_merkletree_1.Hash(bytes), "f");
-        }
         return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
     }
     async setRoot(r) {

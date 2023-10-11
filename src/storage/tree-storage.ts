@@ -31,11 +31,8 @@ export class MongoDBStorage implements ITreeStorage {
     const rootStr = await _collection.findOne({ key: prefixHash });
     let currentRoot: Hash;
     if (rootStr) {
-      console.log('setup:::::::::' + JSON.stringify(rootStr));
       const value: any = JSON.parse(rootStr.value);
-       console.log('setup::::::::: ss' + JSON.stringify(value.bytes));
       currentRoot = new Hash(Uint8Array.from(Object.values(value.bytes)));
-      console.log('setup current root ********* ' + JSON.stringify(currentRoot));
     } else {
       currentRoot = ZERO_HASH;
     }
@@ -75,17 +72,6 @@ export class MongoDBStorage implements ITreeStorage {
   }
 
   async getRoot(): Promise<Hash> {
-    if (!this.#currentRoot.equals(ZERO_HASH)) {
-      return this.#currentRoot;
-    }
-    let root = (await this._collection.findOne({ key: this._prefixHash }))?.value;
-    if (!root) {
-      this.#currentRoot = ZERO_HASH;
-    } else {
-      root = JSON.parse(root);
-      let bytes = root.bytes ? Object.values(root.bytes) : root.bytes;
-      this.#currentRoot = new Hash(bytes);
-    }
     return this.#currentRoot;
   }
 
