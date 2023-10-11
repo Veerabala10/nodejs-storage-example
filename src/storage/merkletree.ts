@@ -141,7 +141,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
   /** binds merkle tree in the mongo db storage to the new identifiers */
   async bindMerkleTreeToNewIdentifier(oldIdentifier: string, newIdentifier: string): Promise<void> {
     let meta = await this._merkleTreeMetaStore.get(oldIdentifier);
-    if (!meta || !meta?.length) {
+    if (!meta || !meta?.meta.length) {
       throw new Error(`Merkle tree meta not found for identifier ${oldIdentifier}`);
     }
 
