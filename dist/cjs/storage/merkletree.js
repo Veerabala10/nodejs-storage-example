@@ -72,7 +72,8 @@ class MerkleTreeMongodDBStorage {
             return treesMeta;
         };
         const treesMeta = createMerkleTreeMetaInfo(identifier);
-        await this._merkleTreeMetaStore.save(identifier, treesMeta);
+        console.log('treesMeta: ' + JSON.stringify(treesMeta));
+        await this._merkleTreeMetaStore.save(identifier, JSON.stringify(treesMeta));
         return treesMeta;
     }
     /**
@@ -84,17 +85,18 @@ class MerkleTreeMongodDBStorage {
     async getIdentityMerkleTreesInfo(identifier) {
         const meta = await this._merkleTreeMetaStore.get(identifier);
         if (meta) {
-            return meta;
+            return JSON.parse(meta);
         }
         throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
     }
     /** get merkle tree from the mongo db storage */
     async getMerkleTreeByIdentifierAndType(identifier, mtType) {
-        const meta = await this._merkleTreeMetaStore.get(identifier);
+        let meta = await this._merkleTreeMetaStore.get(identifier);
         const err = new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
         if (!meta) {
             throw err;
         }
+        meta = JSON.parse(meta);
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
             throw err;
@@ -104,10 +106,11 @@ class MerkleTreeMongodDBStorage {
     }
     /** adds to merkle tree in the mongo db storage */
     async addToMerkleTree(identifier, mtType, hindex, hvalue) {
-        const meta = await this._merkleTreeMetaStore.get(identifier);
+        let meta = await this._merkleTreeMetaStore.get(identifier);
         if (!meta) {
             throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
         }
+        meta = JSON.parse(meta);
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
             throw new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
@@ -118,10 +121,11 @@ class MerkleTreeMongodDBStorage {
     }
     /** binds merkle tree in the mongo db storage to the new identifiers */
     async bindMerkleTreeToNewIdentifier(oldIdentifier, newIdentifier) {
-        const meta = await this._merkleTreeMetaStore.get(oldIdentifier);
+        let meta = await this._merkleTreeMetaStore.get(oldIdentifier);
         if (!meta || !meta?.length) {
             throw new Error(`Merkle tree meta not found for identifier ${oldIdentifier}`);
         }
+        meta = JSON.parse(meta);
         const treesMeta = meta.map((m) => ({
             ...m,
             identifier: newIdentifier
