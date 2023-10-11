@@ -160,7 +160,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       identifier: newIdentifier
     }));
 
-    await this._merkleTreeMetaStore.delete(oldIdentifier, 'identifier');
+    await this._merkleTreeMetaStore.delete(oldIdentifier);
     await this._merkleTreeMetaStore.save(newIdentifier, { meta: JSON.stringify(treesMeta) });
     await this._bindingStore.save(oldIdentifier, { new: newIdentifier });
   }
