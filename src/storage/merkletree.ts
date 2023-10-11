@@ -104,7 +104,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       throw err;
     }
 
-    console.log(JSON.stringify(resultMeta));
+    console.log('resultmeta ' + JSON.stringify(resultMeta));
 
     const mongoDBTreeStorage = await MongoDBStorageFactory(
       str2Bytes(resultMeta.treeId),
