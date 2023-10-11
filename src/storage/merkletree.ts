@@ -7,7 +7,7 @@ import {
   MerkleTreeType
 } from '@0xpolygonid/js-sdk';
 import { MongoDataSource } from './data-source';
-import { MongoDBStorageFactory } from './data-source-factory';
+import { MongoDataSourceFactory, MongoDBStorageFactory } from './data-source-factory';
 
 export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
   MerkleTreeType.Claims,
@@ -15,16 +15,15 @@ export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
   MerkleTreeType.Roots
 ];
 
-   const createMerkleTreeMetaInfo = (identifier: string): IdentityMerkleTreeMetaInformation[] => {
-      const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
-      for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
-        const mType = MERKLE_TREE_TYPES[index];
-        const treeId = `${identifier}+${mType}`;
-        treesMeta.push({ treeId, identifier, type: mType });
-      }
-      return treesMeta;
-    };
-
+const createMerkleTreeMetaInfo = (identifier: string): IdentityMerkleTreeMetaInformation[] => {
+  const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
+  for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
+    const mType = MERKLE_TREE_TYPES[index];
+    const treeId = `${identifier}+${mType}`;
+    treesMeta.push({ treeId, identifier, type: mType });
+  }
+  return treesMeta;
+};
 
 /**
  * Merkle tree storage that uses mongo db storage
@@ -40,12 +39,23 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
    * @param {MongoDataSource<any>} _merkleTreeMetaStore
    * @param {MongoDataSource<any>} _bindingStore
    */
-  constructor(
+  private constructor(
     private readonly _mtDepth: number,
     private readonly _merkleTreeMetaStore: MongoDataSource<any>,
     private readonly _bindingStore: MongoDataSource<any>,
     private readonly _treeStorageMongoConnectionURL: string
   ) {}
+
+  public static async setup(
+    dbUrl: string,
+    dbName: string,
+    mtDepth: number
+  ): Promise<MerkleTreeMongodDBStorage> {
+    let metastore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'metastore');
+    let bindingstore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'binding_store');
+
+    return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);
+  }
 
   /** creates a tree in the indexed db storage */
   async createIdentityMerkleTrees(
@@ -53,7 +63,6 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
   ): Promise<IdentityMerkleTreeMetaInformation[]> {
     if (!identifier) {
       identifier = `${uuid.v4()}`;
-      console.log(' id from uuid:' + identifier);
     }
     const existingBinging = await this._bindingStore.get(identifier);
     if (existingBinging) {
@@ -63,7 +72,6 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     }
 
     const treesMeta = createMerkleTreeMetaInfo(identifier);
-     console.log('saving in createIdentityMerkleTrees id:' + identifier);
     await this._merkleTreeMetaStore.save(identifier, { meta: JSON.stringify(treesMeta) });
     return treesMeta;
   }
@@ -95,7 +103,6 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     }
 
     meta = JSON.parse(meta.meta);
-  console.log(JSON.stringify(meta));
     const resultMeta = meta.find(
       (m: { identifier: string; type: MerkleTreeType }) =>
         m.identifier === identifier && m.type === mtType
@@ -103,8 +110,6 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     if (!resultMeta) {
       throw err;
     }
-
-    console.log('resultMeta.treeId ' + resultMeta.treeId);
 
     const mongoDBTreeStorage = await MongoDBStorageFactory(
       str2Bytes(resultMeta.treeId),
@@ -156,9 +161,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     }));
 
     await this._merkleTreeMetaStore.delete(oldIdentifier, 'identifier');
-    console.log('saving in bind id:' + newIdentifier);
     await this._merkleTreeMetaStore.save(newIdentifier, { meta: JSON.stringify(treesMeta) });
     await this._bindingStore.save(oldIdentifier, { new: newIdentifier });
   }
-
 }

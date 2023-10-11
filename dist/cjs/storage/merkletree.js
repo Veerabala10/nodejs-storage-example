@@ -62,18 +62,21 @@ class MerkleTreeMongodDBStorage {
         this._bindingStore = _bindingStore;
         this._treeStorageMongoConnectionURL = _treeStorageMongoConnectionURL;
     }
+    static async setup(dbUrl, dbName, mtDepth) {
+        let metastore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'metastore');
+        let bindingstore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'binding_store');
+        return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);
+    }
     /** creates a tree in the indexed db storage */
     async createIdentityMerkleTrees(identifier) {
         if (!identifier) {
             identifier = `${uuid.v4()}`;
-            console.log(' id from uuid:' + identifier);
         }
         const existingBinging = await this._bindingStore.get(identifier);
         if (existingBinging) {
             throw new Error(`Present merkle tree meta information in the store for current identifier ${identifier}`);
         }
         const treesMeta = createMerkleTreeMetaInfo(identifier);
-        console.log('saving in createIdentityMerkleTrees id:' + identifier);
         await this._merkleTreeMetaStore.save(identifier, { meta: JSON.stringify(treesMeta) });
         return treesMeta;
     }
@@ -98,12 +101,10 @@ class MerkleTreeMongodDBStorage {
             throw err;
         }
         meta = JSON.parse(meta.meta);
-        console.log(JSON.stringify(meta));
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
             throw err;
         }
-        console.log('resultMeta.treeId ' + resultMeta.treeId);
         const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL);
         return new js_merkletree_1.Merkletree(mongoDBTreeStorage, true, this._mtDepth);
     }
@@ -134,7 +135,6 @@ class MerkleTreeMongodDBStorage {
             identifier: newIdentifier
         }));
         await this._merkleTreeMetaStore.delete(oldIdentifier, 'identifier');
-        console.log('saving in bind id:' + newIdentifier);
         await this._merkleTreeMetaStore.save(newIdentifier, { meta: JSON.stringify(treesMeta) });
         await this._bindingStore.save(oldIdentifier, { new: newIdentifier });
     }

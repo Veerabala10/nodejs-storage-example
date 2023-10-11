@@ -30,18 +30,13 @@ describe('Test MerkleTreeMongodDBStorage', () => {
 
     dataStorage = {
       credential: new CredentialStorage(
-        await MongoDataSourceFactory<W3CCredential>(url, dbName, 'polygonid_credentials')
+        await MongoDataSourceFactory<W3CCredential>(url, dbName, 'credentials')
       ),
       identity: new IdentityStorage(
-        await MongoDataSourceFactory<Identity>(url, dbName, 'polygonid_identity'),
-        await MongoDataSourceFactory<Profile>(url, dbName, 'polygonid_profile')
+        await MongoDataSourceFactory<Identity>(url, dbName, 'identity'),
+        await MongoDataSourceFactory<Profile>(url, dbName, 'profile')
       ),
-      mt: new MerkleTreeMongodDBStorage(
-        40,
-        await MongoDataSourceFactory<any>(url, dbName, 'polygonid_metastore'),
-        await MongoDataSourceFactory<any>(url, dbName, 'polygonid_binding_store'),
-        url
-      ),
+      mt: await MerkleTreeMongodDBStorage.setup(url, dbName, 40),
       states: new EthStateStorage(ethConfig)
     };
   });

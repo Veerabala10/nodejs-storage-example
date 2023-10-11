@@ -1,6 +1,5 @@
 import { Merkletree } from '@iden3/js-merkletree';
 import { IdentityMerkleTreeMetaInformation, IMerkleTreeStorage, MerkleTreeType } from '@0xpolygonid/js-sdk';
-import { MongoDataSource } from './data-source';
 export declare const MERKLE_TREE_TYPES: MerkleTreeType[];
 /**
  * Merkle tree storage that uses mongo db storage
@@ -20,7 +19,8 @@ export declare class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
      * @param {MongoDataSource<any>} _merkleTreeMetaStore
      * @param {MongoDataSource<any>} _bindingStore
      */
-    constructor(_mtDepth: number, _merkleTreeMetaStore: MongoDataSource<any>, _bindingStore: MongoDataSource<any>, _treeStorageMongoConnectionURL: string);
+    private constructor();
+    static setup(dbUrl: string, dbName: string, mtDepth: number): Promise<MerkleTreeMongodDBStorage>;
     /** creates a tree in the indexed db storage */
     createIdentityMerkleTrees(identifier: string): Promise<IdentityMerkleTreeMetaInformation[]>;
     /**
