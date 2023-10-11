@@ -51,7 +51,6 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
       return undefined;
     }
     
-    console.log(JSON.parse(row.value));
     return JSON.parse(row.value) as Type | undefined;
   }
 
