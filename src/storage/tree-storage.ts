@@ -31,10 +31,10 @@ export class MongoDBStorage implements ITreeStorage {
     const rootStr = await _collection.findOne({ key: prefixHash });
     let currentRoot: Hash;
     if (rootStr) {
-      console.log('setup:::::::::' + rootStr);
-      const bytes: number[] = JSON.parse(rootStr.value);
-       console.log('setup::::::::: ss' + JSON.stringify(bytes));
-      currentRoot = new Hash(Uint8Array.from(bytes));
+      console.log('setup:::::::::' + JSON.stringify(rootStr));
+      const value: any = JSON.parse(rootStr.value);
+       console.log('setup::::::::: ss' + JSON.stringify(value.bytes));
+      currentRoot = new Hash(Uint8Array.from(Object.values(value.bytes)));
       console.log('setup current root ********* ' + JSON.stringify(currentRoot));
     } else {
       currentRoot = ZERO_HASH;
