@@ -49,6 +49,7 @@ class MongoDataSource {
         if (!row) {
             return undefined;
         }
+        console.log(JSON.parse(row.value));
         return JSON.parse(row.value);
     }
     /**
