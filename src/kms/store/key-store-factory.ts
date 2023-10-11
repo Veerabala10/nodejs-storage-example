@@ -1,4 +1,3 @@
-import { Bytes } from '@iden3/js-merkletree';
 import { MongoClient, Document } from 'mongodb';
 import { MongoDBPrivateKeyStore } from './key-store';
 
