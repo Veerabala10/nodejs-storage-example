@@ -24,10 +24,10 @@ class MongoDBStorage {
     }
     static async setup(prefix, _collection) {
         const prefixHash = (0, js_merkletree_1.bytes2Hex)(prefix);
-        const rootStr = await _collection.findOne({ key: prefixHash });
+        const rootObj = await _collection.findOne({ key: prefixHash });
         let currentRoot;
-        if (rootStr) {
-            const value = JSON.parse(rootStr.value);
+        if (rootObj) {
+            const value = JSON.parse(rootObj.value);
             currentRoot = new js_merkletree_1.Hash(Uint8Array.from(Object.values(value.bytes)));
         }
         else {

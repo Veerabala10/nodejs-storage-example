@@ -28,10 +28,10 @@ export class MongoDBStorage implements ITreeStorage {
 
   public static async setup(prefix: Bytes, _collection: Collection<any>): Promise<MongoDBStorage> {
     const prefixHash = bytes2Hex(prefix);
-    const rootStr = await _collection.findOne({ key: prefixHash });
+    const rootObj = await _collection.findOne({ key: prefixHash });
     let currentRoot: Hash;
-    if (rootStr) {
-      const value: any = JSON.parse(rootStr.value);
+    if (rootObj) {
+      const value: any = JSON.parse(rootObj.value);
       currentRoot = new Hash(Uint8Array.from(Object.values(value.bytes)));
     } else {
       currentRoot = ZERO_HASH;
