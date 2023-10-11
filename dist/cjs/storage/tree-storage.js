@@ -48,6 +48,7 @@ class MongoDBStorage {
     async put(k, n) {
         const kBytes = new Uint8Array([...this._prefix, ...k]);
         const key = (0, js_merkletree_1.bytes2Hex)(kBytes);
+        await this._collection.findOneAndDelete({ key: key });
         await this._collection.insertOne({ key: key, value: JSON.stringify(n) });
     }
     async getRoot() {
@@ -60,14 +61,13 @@ class MongoDBStorage {
         }
         else {
             root = JSON.parse(root);
-            // console.log(root);
             let bytes = root.bytes ? Object.values(root.bytes) : root.bytes;
             __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, new js_merkletree_1.Hash(bytes), "f");
         }
         return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
     }
     async setRoot(r) {
-        // console.log('set' + JSON.stringify(r) );
+        await this._collection.findOneAndDelete({ key: this._prefixHash });
         await this._collection.insertOne({ key: this._prefixHash, value: JSON.stringify(r) });
         __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, r, "f");
     }
