@@ -15,6 +15,17 @@ export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
   MerkleTreeType.Roots
 ];
 
+   const createMerkleTreeMetaInfo = (identifier: string): IdentityMerkleTreeMetaInformation[] => {
+      const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
+      for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
+        const mType = MERKLE_TREE_TYPES[index];
+        const treeId = `${identifier}+${mType}`;
+        treesMeta.push({ treeId, identifier, type: mType });
+      }
+      return treesMeta;
+    };
+
+
 /**
  * Merkle tree storage that uses mongo db storage
  *
@@ -42,6 +53,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
   ): Promise<IdentityMerkleTreeMetaInformation[]> {
     if (!identifier) {
       identifier = `${uuid.v4()}`;
+      console.log(' id from uuid:' + identifier);
     }
     const existingBinging = await this._bindingStore.get(identifier);
     if (existingBinging) {
@@ -49,16 +61,6 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
         `Present merkle tree meta information in the store for current identifier ${identifier}`
       );
     }
-
-    const createMerkleTreeMetaInfo = (identifier: string): IdentityMerkleTreeMetaInformation[] => {
-      const treesMeta: IdentityMerkleTreeMetaInformation[] = [];
-      for (let index = 0; index < MERKLE_TREE_TYPES.length; index++) {
-        const mType = MERKLE_TREE_TYPES[index];
-        const treeId = `${identifier}+${mType}`;
-        treesMeta.push({ treeId, identifier, type: mType });
-      }
-      return treesMeta;
-    };
 
     const treesMeta = createMerkleTreeMetaInfo(identifier);
      console.log('saving in createIdentityMerkleTrees id:' + identifier);
