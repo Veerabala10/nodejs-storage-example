@@ -72,7 +72,7 @@ class MerkleTreeMongodDBStorage {
             return treesMeta;
         };
         const treesMeta = createMerkleTreeMetaInfo(identifier);
-        console.log('treesMeta: ' + JSON.stringify(treesMeta));
+        console.log('saving in createIdentityMerkleTrees id:' + identifier);
         await this._merkleTreeMetaStore.save(identifier, { meta: JSON.stringify(treesMeta) });
         return treesMeta;
     }
@@ -110,7 +110,6 @@ class MerkleTreeMongodDBStorage {
         if (!meta || !meta.meta) {
             throw new Error(`Merkle tree meta not found for identifier ${identifier}`);
         }
-        console.log('addToMerkleTree:' + meta.meta);
         meta = JSON.parse(meta.meta);
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
@@ -132,7 +131,7 @@ class MerkleTreeMongodDBStorage {
             identifier: newIdentifier
         }));
         await this._merkleTreeMetaStore.delete(oldIdentifier, 'identifier');
-        console.log('bindMerkleTreeToNewIdentifier: ' + JSON.stringify(treesMeta));
+        console.log('saving in bind id:' + newIdentifier);
         await this._merkleTreeMetaStore.save(newIdentifier, { meta: JSON.stringify(treesMeta) });
         await this._bindingStore.save(oldIdentifier, newIdentifier);
     }
