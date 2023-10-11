@@ -50,7 +50,6 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
     if (!row) {
       return undefined;
     }
-    console.log(row);
     return JSON.parse(row.value);
   }
 
