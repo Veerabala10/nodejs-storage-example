@@ -134,7 +134,7 @@ class MerkleTreeMongodDBStorage {
         await this._merkleTreeMetaStore.delete(oldIdentifier, 'identifier');
         console.log('saving in bind id:' + newIdentifier);
         await this._merkleTreeMetaStore.save(newIdentifier, { meta: JSON.stringify(treesMeta) });
-        await this._bindingStore.save(oldIdentifier, newIdentifier);
+        await this._bindingStore.save(oldIdentifier, { new: newIdentifier });
     }
 }
 exports.MerkleTreeMongodDBStorage = MerkleTreeMongodDBStorage;
