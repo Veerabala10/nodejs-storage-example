@@ -27,6 +27,7 @@ class MongoDataSource {
      * @param {string} [keyName] - key name
      */
     async save(key, value, keyName = '_id') {
+        await this.delete(key, keyName);
         const document = {
             [keyName]: key,
             value: JSON.stringify(value)
@@ -45,7 +46,6 @@ class MongoDataSource {
             [keyName]: key
         };
         const row = await this._collection.findOne(filter);
-        console.log('aa' + JSON.stringify(row));
         if (!row) {
             return undefined;
         }

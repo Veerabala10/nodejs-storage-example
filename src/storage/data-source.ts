@@ -27,6 +27,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} [keyName] - key name
    */
   public async save(key: string, value: Type, keyName = '_id'): Promise<void> {
+    await this.delete(key, keyName);
     const document = {
       [keyName]: key,
       value: JSON.stringify(value)
@@ -46,7 +47,6 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
       [keyName]: key
     } as Filter<Type>;
     const row = await this._collection.findOne(filter);
-    console.log('aa' + JSON.stringify(row));
     if (!row) {
       return undefined;
     }
