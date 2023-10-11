@@ -16,7 +16,7 @@ class MongoDataSource {
     load() {
         return this._collection
             .find({})
-            .map((i) => i)
+            .map((i) => JSON.parse(i.value))
             .toArray();
     }
     /**
@@ -29,7 +29,7 @@ class MongoDataSource {
     async save(key, value, keyName = '_id') {
         const document = {
             [keyName]: key,
-            ...value
+            value: JSON.stringify(value)
         };
         await this._collection.insertOne(document);
     }
@@ -44,7 +44,13 @@ class MongoDataSource {
         const filter = {
             [keyName]: key
         };
-        return ((await this._collection.findOne(filter)) ?? undefined);
+        const row = await this._collection.findOne(filter);
+        console.log('aa' + JSON.stringify(row));
+        if (!row) {
+            return undefined;
+        }
+        console.log(row);
+        return JSON.parse(row.value);
     }
     /**
      * deletes data value for given key with an optional key name

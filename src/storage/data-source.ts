@@ -15,7 +15,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public load(): Promise<Type[]> {
     return this._collection
       .find({})
-      .map((i) => i as Type)
+      .map((i) => JSON.parse(i.value) as Type)
       .toArray();
   }
 
@@ -29,7 +29,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public async save(key: string, value: Type, keyName = '_id'): Promise<void> {
     const document = {
       [keyName]: key,
-      ...value
+      value: JSON.stringify(value)
     };
     await this._collection.insertOne(document as any);
   }
@@ -45,7 +45,13 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
     const filter = {
       [keyName]: key
     } as Filter<Type>;
-    return ((await this._collection.findOne(filter)) ?? undefined) as Type | undefined;
+    const row = await this._collection.findOne(filter);
+    console.log('aa' + JSON.stringify(row));
+    if (!row) {
+      return undefined;
+    }
+    console.log(row);
+    return JSON.parse(row.value);
   }
 
   /**
