@@ -95,7 +95,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     }
 
     meta = JSON.parse(meta.meta);
-
+  console.log(JSON.stringify(meta));
     const resultMeta = meta.find(
       (m: { identifier: string; type: MerkleTreeType }) =>
         m.identifier === identifier && m.type === mtType
@@ -103,6 +103,8 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     if (!resultMeta) {
       throw err;
     }
+
+    console.log(JSON.stringify(resultMeta));
 
     const mongoDBTreeStorage = await MongoDBStorageFactory(
       str2Bytes(resultMeta.treeId),

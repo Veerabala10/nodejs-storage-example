@@ -98,10 +98,12 @@ class MerkleTreeMongodDBStorage {
             throw err;
         }
         meta = JSON.parse(meta.meta);
+        console.log(JSON.stringify(meta));
         const resultMeta = meta.find((m) => m.identifier === identifier && m.type === mtType);
         if (!resultMeta) {
             throw err;
         }
+        console.log(JSON.stringify(resultMeta));
         const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL);
         return new js_merkletree_1.Merkletree(mongoDBTreeStorage, true, this._mtDepth);
     }
