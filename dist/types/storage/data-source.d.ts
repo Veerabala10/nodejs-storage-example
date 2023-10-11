@@ -19,7 +19,7 @@ export declare class MongoDataSource<Type extends Document> implements IDataSour
      * @param {Type} value - value to store
      * @param {string} [keyName] - key name
      */
-    save(key: string, value: Type, keyName?: string): Promise<void>;
+    save(key: string, value: Type): Promise<void>;
     /**
      * returns data value for key value and optional key name
      *
@@ -27,12 +27,12 @@ export declare class MongoDataSource<Type extends Document> implements IDataSour
      * @param {string} [keyName] -  key name
      * @returns ` {(Type | undefined)}`
      */
-    get(key: string, keyName?: string): Promise<Type | undefined>;
+    get(key: string): Promise<Type | undefined>;
     /**
      * deletes data value for given key with an optional key name
      *
      * @param {string} key - key value
      * @param {string} [keyName] -  key name
      */
-    delete(key: string, keyName?: string): Promise<void>;
+    delete(key: string): Promise<void>;
 }

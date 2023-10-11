@@ -26,10 +26,10 @@ class MongoDataSource {
      * @param {Type} value - value to store
      * @param {string} [keyName] - key name
      */
-    async save(key, value, keyName = '_id') {
-        await this.delete(key, keyName);
+    async save(key, value) {
+        await this.delete(key);
         const document = {
-            [keyName]: key,
+            '_id': key,
             value: JSON.stringify(value)
         };
         await this._collection.insertOne(document);
@@ -41,9 +41,9 @@ class MongoDataSource {
      * @param {string} [keyName] -  key name
      * @returns ` {(Type | undefined)}`
      */
-    async get(key, keyName = '_id') {
+    async get(key) {
         const filter = {
-            [keyName]: key
+            '_id': key
         };
         const row = await this._collection.findOne(filter);
         if (!row) {
@@ -57,9 +57,9 @@ class MongoDataSource {
      * @param {string} key - key value
      * @param {string} [keyName] -  key name
      */
-    async delete(key, keyName = '_id') {
+    async delete(key) {
         const filter = {
-            [keyName]: key
+            '_id': key
         };
         await this._collection.deleteOne(filter);
     }

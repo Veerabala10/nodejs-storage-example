@@ -26,10 +26,10 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {Type} value - value to store
    * @param {string} [keyName] - key name
    */
-  public async save(key: string, value: Type, keyName = '_id'): Promise<void> {
-    await this.delete(key, keyName);
+  public async save(key: string, value: Type): Promise<void> {
+    await this.delete(key);
     const document = {
-      [keyName]: key,
+      '_id': key,
       value: JSON.stringify(value)
     };
     await this._collection.insertOne(document as any);
@@ -42,9 +42,9 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} [keyName] -  key name
    * @returns ` {(Type | undefined)}`
    */
-  public async get(key: string, keyName = '_id'): Promise<Type | undefined> {
+  public async get(key: string): Promise<Type | undefined> {
     const filter = {
-      [keyName]: key
+      '_id': key
     } as Filter<Type>;
     const row = await this._collection.findOne(filter);
     if (!row) {
@@ -60,9 +60,9 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} key - key value
    * @param {string} [keyName] -  key name
    */
-  public async delete(key: string, keyName = '_id'): Promise<void> {
+  public async delete(key: string): Promise<void> {
     const filter = {
-      [keyName]: key
+      '_id': key
     } as Filter<Type>;
     await this._collection.deleteOne(filter);
   }
