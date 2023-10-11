@@ -61,6 +61,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     };
 
     const treesMeta = createMerkleTreeMetaInfo(identifier);
+    console.log('treesMeta: ' + JSON.stringify(treesMeta));
     await this._merkleTreeMetaStore.save(identifier, JSON.stringify(treesMeta));
     return treesMeta;
   }
