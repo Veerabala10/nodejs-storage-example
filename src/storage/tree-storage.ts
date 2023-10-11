@@ -15,13 +15,30 @@ import {
 import { Collection } from 'mongodb';
 
 export class MongoDBStorage implements ITreeStorage {
-  private readonly _prefixHash: string;
-
   #currentRoot: Hash;
 
-  constructor(private readonly _prefix: Bytes, private readonly _collection: Collection<any>) {
-    this.#currentRoot = ZERO_HASH;
-    this._prefixHash = bytes2Hex(_prefix);
+  private constructor(
+    private readonly _collection: Collection<any>,
+    private readonly _prefix: Bytes,
+    private readonly _prefixHash: string,
+    currentRoot: Hash
+  ) {
+    this.#currentRoot = currentRoot;
+  }
+
+  public static async setup(prefix: Bytes, _collection: Collection<any>): Promise<MongoDBStorage> {
+    const prefixHash = bytes2Hex(prefix);
+    const rootStr = await _collection.findOne({ key: prefixHash });
+    let currentRoot: Hash;
+    if (rootStr) {
+      const bytes: number[] = JSON.parse(rootStr.value);
+
+      currentRoot = new Hash(Uint8Array.from(Object.values(bytes)));
+      console.log('setup current root ********* ' + JSON.stringify(currentRoot));
+    } else {
+      currentRoot = ZERO_HASH;
+    }
+    return new MongoDBStorage(_collection, prefix, prefixHash, currentRoot);
   }
 
   async get(k: Bytes): Promise<Node | undefined> {

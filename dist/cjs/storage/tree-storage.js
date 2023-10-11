@@ -15,12 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoDBStorage = void 0;
 const js_merkletree_1 = require("@iden3/js-merkletree");
 class MongoDBStorage {
-    constructor(_prefix, _collection) {
-        this._prefix = _prefix;
+    constructor(_collection, _prefix, _prefixHash, currentRoot) {
         this._collection = _collection;
+        this._prefix = _prefix;
+        this._prefixHash = _prefixHash;
         _MongoDBStorage_currentRoot.set(this, void 0);
-        __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, js_merkletree_1.ZERO_HASH, "f");
-        this._prefixHash = (0, js_merkletree_1.bytes2Hex)(_prefix);
+        __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, currentRoot, "f");
+    }
+    static async setup(prefix, _collection) {
+        const prefixHash = (0, js_merkletree_1.bytes2Hex)(prefix);
+        const rootStr = await _collection.findOne({ key: prefixHash });
+        let currentRoot;
+        if (rootStr) {
+            const bytes = JSON.parse(rootStr.value);
+            currentRoot = new js_merkletree_1.Hash(Uint8Array.from(Object.values(bytes)));
+            console.log('setup current root ********* ' + JSON.stringify(currentRoot));
+        }
+        else {
+            currentRoot = js_merkletree_1.ZERO_HASH;
+        }
+        return new MongoDBStorage(_collection, prefix, prefixHash, currentRoot);
     }
     async get(k) {
         const kBytes = new Uint8Array([...this._prefix, ...k]);

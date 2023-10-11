@@ -63,7 +63,7 @@ class MerkleTreeMongodDBStorage {
         this._treeStorageMongoConnectionURL = _treeStorageMongoConnectionURL;
     }
     static async setup(dbUrl, dbName, mtDepth) {
-        let metastore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'metastore');
+        let metastore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'meta_store');
         let bindingstore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'binding_store');
         return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);
     }

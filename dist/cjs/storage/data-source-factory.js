@@ -23,7 +23,7 @@ const MongoDBStorageFactory = async (prefix, url, dbName, collection) => {
     await client.connect();
     const db = client.db(dbName ?? 'merkle-tree');
     const collectionInstance = db.collection(collection ?? 'merkle-tree');
-    return new tree_storage_1.MongoDBStorage(prefix, collectionInstance);
+    return tree_storage_1.MongoDBStorage.setup(prefix, collectionInstance);
 };
 exports.MongoDBStorageFactory = MongoDBStorageFactory;
 //# sourceMappingURL=data-source-factory.js.map

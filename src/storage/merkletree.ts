@@ -51,7 +51,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     dbName: string,
     mtDepth: number
   ): Promise<MerkleTreeMongodDBStorage> {
-    let metastore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'metastore');
+    let metastore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'meta_store');
     let bindingstore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'binding_store');
 
     return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);

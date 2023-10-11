@@ -31,5 +31,5 @@ export const MongoDBStorageFactory = async (
   await client.connect();
   const db = client.db(dbName ?? 'merkle-tree');
   const collectionInstance = db.collection<any>(collection ?? 'merkle-tree');
-  return new MongoDBStorage(prefix, collectionInstance);
+  return MongoDBStorage.setup(prefix, collectionInstance);
 };
