@@ -61,5 +61,13 @@ describe('Test MongoDB Data Source', () => {
     const identityFromDb = await dbSourceIdentity.get('1');
     const hashFromRow = new Hash(Object.values(identityFromDb!.state!.bytes) as unknown as Uint8Array);
     expect(v.bigInt()).to.be.equal(hashFromRow.bigInt());
+
+    profileFind = await dbSource.get('testverifier', 'verifier');
+    expect(profileFind?.nonce).to.be.equal(223);
+    await dbSource.delete('testverifier', 'verifier');
+    profiles = await dbSource.load();
+    expect(profiles.length).length.to.be.equal(0);
+    profileFind = await dbSource.get(keyVal);
+    expect(profileFind).to.be.undefined;
   });
 });

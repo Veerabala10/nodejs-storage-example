@@ -15,7 +15,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public load(): Promise<Type[]> {
     return this._collection
       .find({})
-      .map((i) => JSON.parse(i.value) as Type)
+      .map((i) => { return {_id: i._id, ...JSON.parse(i.value) } })
       .toArray();
   }
 
@@ -26,10 +26,10 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {Type} value - value to store
    * @param {string} [keyName] - key name
    */
-  public async save(key: string, value: Type): Promise<void> {
-    await this.delete(key);
+  public async save(key: string, value: Type, keyName = '_id'): Promise<void> {
+    await this.delete(key, keyName);
     const document = {
-      '_id': key,
+      [keyName]: key,
       value: JSON.stringify(value)
     };
     await this._collection.insertOne(document as any);
@@ -42,16 +42,9 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} [keyName] -  key name
    * @returns ` {(Type | undefined)}`
    */
-  public async get(key: string): Promise<Type | undefined> {
-    const filter = {
-      '_id': key
-    } as Filter<Type>;
-    const row = await this._collection.findOne(filter);
-    if (!row) {
-      return undefined;
-    }
-    console.log(row.value);
-    return JSON.parse(row.value) as Type;
+  public async get(key: string, keyName = '_id'): Promise<Type | undefined> {
+    let rows = await this.load();
+    return rows.find(i => i[keyName] === key);
   }
 
   /**
@@ -60,9 +53,13 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} key - key value
    * @param {string} [keyName] -  key name
    */
-  public async delete(key: string): Promise<void> {
+  public async delete(key: string, keyName = '_id'): Promise<void> {
+    let row = await this.get(key, keyName);
+    if (!row) {
+      return;
+    }
     const filter = {
-      '_id': key
+      '_id': row._id
     } as Filter<Type>;
     await this._collection.deleteOne(filter);
   }
