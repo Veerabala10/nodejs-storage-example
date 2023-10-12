@@ -12,7 +12,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    *
    * @returns `{Type[]}`
    */
-  public async load(): Promise<Type[]> {
+  public load(): Promise<Type[]> {
     return this._collection
       .find({})
       .map((i) => { return {_id: i._id, ...JSON.parse(i.value) } })
