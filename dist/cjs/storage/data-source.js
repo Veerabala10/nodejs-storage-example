@@ -16,7 +16,7 @@ class MongoDataSource {
     load() {
         return this._collection
             .find({})
-            .map((i) => { return { _id: i._id, ...JSON.parse(i.value) }; })
+            .map((i) => JSON.parse(i.value))
             .toArray();
     }
     /**
@@ -26,10 +26,10 @@ class MongoDataSource {
      * @param {Type} value - value to store
      * @param {string} [keyName] - key name
      */
-    async save(key, value, keyName = '_id') {
-        await this.delete(key, keyName);
+    async save(key, value) {
+        await this.delete(key);
         const document = {
-            [keyName]: key,
+            '_id': key,
             value: JSON.stringify(value)
         };
         await this._collection.insertOne(document);
@@ -41,9 +41,16 @@ class MongoDataSource {
      * @param {string} [keyName] -  key name
      * @returns ` {(Type | undefined)}`
      */
-    async get(key, keyName = '_id') {
-        let rows = await this.load();
-        return rows.find(i => i[keyName] === key);
+    async get(key) {
+        const filter = {
+            '_id': key
+        };
+        const row = await this._collection.findOne(filter);
+        if (!row) {
+            return undefined;
+        }
+        console.log(row.value);
+        return JSON.parse(row.value);
     }
     /**
      * deletes data value for given key with an optional key name
@@ -51,13 +58,9 @@ class MongoDataSource {
      * @param {string} key - key value
      * @param {string} [keyName] -  key name
      */
-    async delete(key, keyName = '_id') {
-        let row = await this.get(key, keyName);
-        if (!row) {
-            return;
-        }
+    async delete(key) {
         const filter = {
-            '_id': row._id
+            '_id': key
         };
         await this._collection.deleteOne(filter);
     }
