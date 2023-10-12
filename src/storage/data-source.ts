@@ -15,7 +15,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public load(): Promise<Type[]> {
     return this._collection
       .find({})
-      .map((i) => { return {_id: i._id, ...JSON.parse(i.value) } })
+      .map((i) => { return {_id: i._id, ...JSON.parse(i.value) } as Type })
       .toArray();
   }
 
@@ -44,7 +44,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    */
   public async get(key: string, keyName = '_id'): Promise<Type | undefined> {
     let rows = await this.load();
-    return rows.find(i => i[keyName] === key);
+    return rows.find(i => i[keyName] === key) as Type;
   }
 
   /**
