@@ -14,7 +14,7 @@ class MongoDataSource {
      * @returns `{Type[]}`
      */
     async load() {
-        return await this._collection
+        return this._collection
             .find({})
             .map((i) => { return { _id: i._id, ...JSON.parse(i.value) }; })
             .toArray();
