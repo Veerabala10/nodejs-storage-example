@@ -56,16 +56,17 @@ class MerkleTreeMongodDBStorage {
      * @param {MongoDataSource<any>} _merkleTreeMetaStore
      * @param {MongoDataSource<any>} _bindingStore
      */
-    constructor(_mtDepth, _merkleTreeMetaStore, _bindingStore, _treeStorageMongoConnectionURL) {
+    constructor(_mtDepth, _merkleTreeMetaStore, _bindingStore, _treeStorageMongoConnectionURL, _dbName) {
         this._mtDepth = _mtDepth;
         this._merkleTreeMetaStore = _merkleTreeMetaStore;
         this._bindingStore = _bindingStore;
         this._treeStorageMongoConnectionURL = _treeStorageMongoConnectionURL;
+        this._dbName = _dbName;
     }
     static async setup(dbUrl, dbName, mtDepth) {
         let metastore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'meta_store');
         let bindingstore = await (0, data_source_factory_1.MongoDataSourceFactory)(dbUrl, dbName, 'binding_store');
-        return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);
+        return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl, dbName);
     }
     /** creates a tree in the indexed db storage */
     async createIdentityMerkleTrees(identifier) {
@@ -105,7 +106,7 @@ class MerkleTreeMongodDBStorage {
         if (!resultMeta) {
             throw err;
         }
-        const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL);
+        const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL, this._dbName);
         return new js_merkletree_1.Merkletree(mongoDBTreeStorage, true, this._mtDepth);
     }
     /** adds to merkle tree in the mongo db storage */
@@ -119,7 +120,7 @@ class MerkleTreeMongodDBStorage {
         if (!resultMeta) {
             throw new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
         }
-        const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL);
+        const mongoDBTreeStorage = await (0, data_source_factory_1.MongoDBStorageFactory)((0, js_merkletree_1.str2Bytes)(resultMeta.treeId), this._treeStorageMongoConnectionURL, this._dbName);
         const tree = new js_merkletree_1.Merkletree(mongoDBTreeStorage, true, this._mtDepth);
         await tree.add(hindex, hvalue);
     }

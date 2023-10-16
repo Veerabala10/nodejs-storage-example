@@ -43,7 +43,8 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     private readonly _mtDepth: number,
     private readonly _merkleTreeMetaStore: MongoDataSource<any>,
     private readonly _bindingStore: MongoDataSource<any>,
-    private readonly _treeStorageMongoConnectionURL: string
+    private readonly _treeStorageMongoConnectionURL: string,
+    private readonly _dbName: string
   ) {}
 
   public static async setup(
@@ -54,7 +55,7 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     let metastore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'meta_store');
     let bindingstore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'binding_store');
 
-    return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl);
+    return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl, dbName);
   }
 
   /** creates a tree in the indexed db storage */
@@ -113,7 +114,8 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
 
     const mongoDBTreeStorage = await MongoDBStorageFactory(
       str2Bytes(resultMeta.treeId),
-      this._treeStorageMongoConnectionURL
+      this._treeStorageMongoConnectionURL,
+      this._dbName
     );
     return new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
   }
@@ -139,7 +141,8 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
 
     const mongoDBTreeStorage = await MongoDBStorageFactory(
       str2Bytes(resultMeta.treeId),
-      this._treeStorageMongoConnectionURL
+      this._treeStorageMongoConnectionURL,
+      this._dbName
     );
     const tree = new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
 

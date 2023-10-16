@@ -13,6 +13,7 @@ export declare class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     private readonly _merkleTreeMetaStore;
     private readonly _bindingStore;
     private readonly _treeStorageMongoConnectionURL;
+    private readonly _dbName;
     /**
      * Creates an instance of MerkleTreeIndexedDBStorage.
      * @param {number} _mtDepth
