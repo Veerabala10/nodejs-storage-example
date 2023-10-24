@@ -32,7 +32,7 @@ export class MongoDBStorage implements ITreeStorage {
     let currentRoot: Hash;
     if (rootObj) {
       const value: any = JSON.parse(rootObj.value);
-      currentRoot = new Hash(Uint8Array.from(Object.values(value.bytes)));
+      currentRoot = Hash.fromString(value);
     } else {
       currentRoot = ZERO_HASH;
     }
@@ -51,13 +51,13 @@ export class MongoDBStorage implements ITreeStorage {
       return new NodeEmpty();
     }
     if (obj.type === NODE_TYPE_MIDDLE) {
-      const cL = new Hash(Uint8Array.from(Object.values(obj.childL.bytes)));
-      const cR = new Hash(Uint8Array.from(Object.values(obj.childR.bytes)));
+      const cL = Hash.fromString(obj.childL);
+      const cR = Hash.fromString(obj.childR);
       return new NodeMiddle(cL, cR);
     }
     if (obj.type === NODE_TYPE_LEAF) {
-      const k = new Hash(Uint8Array.from(Object.values(obj.entry[0].bytes)));
-      const v = new Hash(Uint8Array.from(Object.values(obj.entry[1].bytes)));
+      const k = Hash.fromString(obj.entry[0]);
+      const v = Hash.fromString(obj.entry[1]);
 
       return new NodeLeaf(k, v);
     }
