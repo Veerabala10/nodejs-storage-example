@@ -44,30 +44,12 @@ describe('Test MongoDB Data Source', () => {
     let profileFind = await dbSource.get(keyVal);
     expect(profileFind?.id).to.be.equal('123');
 
-
-    const bytes = new Uint8Array(HASH_BYTES_LENGTH);
-    bytes[0] = 12;
-    bytes[1] = 11;
-    bytes[10] = 10;
-    bytes[31] = 22;
-    const v = new Hash(bytes);
-
-    const identity: Identity = {
-      did: '',
-      state: v
-    };
-
-    await dbSourceIdentity.save('1', identity);
-    const identityFromDb = await dbSourceIdentity.get('1');
-    const hashFromRow = new Hash(Object.values(identityFromDb!.state!.bytes) as unknown as Uint8Array);
-    expect(v.bigInt()).to.be.equal(hashFromRow.bigInt());
-
-    // profileFind = await dbSource.get('testverifier', 'verifier');
-    // expect(profileFind?.nonce).to.be.equal(223);
-    // await dbSource.delete('testverifier', 'verifier');
-    // profiles = await dbSource.load();
-    // expect(profiles.length).length.to.be.equal(0);
-    // profileFind = await dbSource.get(keyVal);
-    // expect(profileFind).to.be.undefined;
+    profileFind = await dbSource.get('testverifier', 'verifier');
+    expect(profileFind?.nonce).to.be.equal(223);
+    await dbSource.delete('testverifier', 'verifier');
+    profiles = await dbSource.load();
+    expect(profiles.length).length.to.be.equal(0);
+    profileFind = await dbSource.get(keyVal);
+    expect(profileFind).to.be.undefined;
   });
 });

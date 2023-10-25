@@ -15,7 +15,7 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public load(): Promise<Type[]> {
     return this._collection
       .find({})
-      .map((i) => JSON.parse(i.value) as Type)
+      .map((i) => {  delete (i as unknown as any)._id; return i as Type;} )
       .toArray();
   }
 
@@ -26,11 +26,11 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {Type} value - value to store
    * @param {string} [keyName] - key name
    */
-  public async save(key: string, value: Type): Promise<void> {
-    await this.delete(key);
+  public async save(key: string, value: Type, keyName = '_id'): Promise<void> {
+    await this.delete(key, keyName);
     const document = {
-      '_id': key,
-      value: JSON.stringify(value)
+      [keyName]: key,
+      ...value
     };
     await this._collection.insertOne(document as any);
   }
@@ -42,15 +42,16 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} [keyName] -  key name
    * @returns ` {(Type | undefined)}`
    */
-  public async get(key: string): Promise<Type | undefined> {
+  public async get(key: string, keyName = '_id'): Promise<Type | undefined> {
     const filter = {
-      '_id': key
+      [keyName]: key
     } as Filter<Type>;
     const row = await this._collection.findOne(filter);
     if (!row) {
       return undefined;
     }
-    return JSON.parse(row.value) as Type;
+    delete (row as unknown as any)._id;
+    return row as Type;
   }
 
   /**
@@ -59,9 +60,9 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
    * @param {string} key - key value
    * @param {string} [keyName] -  key name
    */
-  public async delete(key: string): Promise<void> {
+  public async delete(key: string, keyName = '_id'): Promise<void> {
     const filter = {
-      '_id': key
+      [keyName]: key
     } as Filter<Type>;
     await this._collection.deleteOne(filter);
   }
