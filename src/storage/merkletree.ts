@@ -7,7 +7,8 @@ import {
   MerkleTreeType
 } from '@0xpolygonid/js-sdk';
 import { MongoDataSource } from './data-source';
-import { MongoDataSourceFactory, MongoDBStorageFactory } from './data-source-factory';
+import { MongoDataSourceFactory, MongoDBTreeStorageFactory } from './data-source-factory';
+import { Db } from 'mongodb';
 
 export const MERKLE_TREE_TYPES: MerkleTreeType[] = [
   MerkleTreeType.Claims,
@@ -43,19 +44,15 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
     private readonly _mtDepth: number,
     private readonly _merkleTreeMetaStore: MongoDataSource<any>,
     private readonly _bindingStore: MongoDataSource<any>,
-    private readonly _treeStorageMongoConnectionURL: string,
-    private readonly _dbName: string
-  ) {}
+    private readonly _db: Db // private readonly _treeStorageMongoConnectionURL: string,
+  ) // private readonly _dbName: string
+  {}
 
-  public static async setup(
-    dbUrl: string,
-    dbName: string,
-    mtDepth: number
-  ): Promise<MerkleTreeMongodDBStorage> {
-    let metastore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'meta_store');
-    let bindingstore = await MongoDataSourceFactory<any>(dbUrl, dbName, 'binding_store');
+  public static async setup(db: Db, mtDepth: number): Promise<MerkleTreeMongodDBStorage> {
+    let metastore = await MongoDataSourceFactory<any>(db, 'meta_store');
+    let bindingstore = await MongoDataSourceFactory<any>(db, 'binding_store');
 
-    return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, dbUrl, dbName);
+    return new MerkleTreeMongodDBStorage(mtDepth, metastore, bindingstore, db);
   }
 
   /** creates a tree in the indexed db storage */
@@ -112,10 +109,9 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       throw err;
     }
 
-    const mongoDBTreeStorage = await MongoDBStorageFactory(
-      str2Bytes(resultMeta.treeId),
-      this._treeStorageMongoConnectionURL,
-      this._dbName
+    const mongoDBTreeStorage = await MongoDBTreeStorageFactory(
+      this._db,
+      str2Bytes(resultMeta.treeId)
     );
     return new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
   }
@@ -139,10 +135,9 @@ export class MerkleTreeMongodDBStorage implements IMerkleTreeStorage {
       throw new Error(`Merkle tree not found for identifier ${identifier} and type ${mtType}`);
     }
 
-    const mongoDBTreeStorage = await MongoDBStorageFactory(
-      str2Bytes(resultMeta.treeId),
-      this._treeStorageMongoConnectionURL,
-      this._dbName
+    const mongoDBTreeStorage = await MongoDBTreeStorageFactory(
+      this._db,
+      str2Bytes(resultMeta.treeId)
     );
     const tree = new Merkletree(mongoDBTreeStorage, true, this._mtDepth);
 

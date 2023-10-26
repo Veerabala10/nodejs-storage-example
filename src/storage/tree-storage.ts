@@ -14,7 +14,7 @@ import {
 } from '@iden3/js-merkletree';
 import { Collection } from 'mongodb';
 
-export class MongoDBStorage implements ITreeStorage {
+export class MongoDBTreeStorage implements ITreeStorage {
   #currentRoot: Hash;
 
   private constructor(
@@ -26,7 +26,10 @@ export class MongoDBStorage implements ITreeStorage {
     this.#currentRoot = currentRoot;
   }
 
-  public static async setup(prefix: Bytes, _collection: Collection<any>): Promise<MongoDBStorage> {
+  public static async setup(
+    prefix: Bytes,
+    _collection: Collection<any>
+  ): Promise<MongoDBTreeStorage> {
     const prefixHash = bytes2Hex(prefix);
     const rootObj = await _collection.findOne({ key: prefixHash });
     let currentRoot: Hash;
@@ -36,7 +39,7 @@ export class MongoDBStorage implements ITreeStorage {
     } else {
       currentRoot = ZERO_HASH;
     }
-    return new MongoDBStorage(_collection, prefix, prefixHash, currentRoot);
+    return new MongoDBTreeStorage(_collection, prefix, prefixHash, currentRoot);
   }
 
   async get(k: Bytes): Promise<Node | undefined> {

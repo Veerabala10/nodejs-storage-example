@@ -1,29 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MongoDBStorageFactory = exports.MongoDataSourceFactory = void 0;
-const mongodb_1 = require("mongodb");
+exports.MongoDBTreeStorageFactory = exports.MongoDataSourceFactory = void 0;
 const data_source_1 = require("./data-source");
 const tree_storage_1 = require("./tree-storage");
 /**
  * Returns instance of Mongo Data Source
  */
-const MongoDataSourceFactory = async (url, dbName, collection) => {
-    const client = new mongodb_1.MongoClient(url);
-    await client.connect();
-    const db = client.db(dbName);
+const MongoDataSourceFactory = async (db, collection) => {
     const collectionInstance = db.collection(collection);
     return new data_source_1.MongoDataSource(collectionInstance);
 };
 exports.MongoDataSourceFactory = MongoDataSourceFactory;
 /**
- * Returns instance of MongoDBStorage
+ * Returns instance of MongoDBTreeStorage
  */
-const MongoDBStorageFactory = async (prefix, url, dbName, collection) => {
-    const client = new mongodb_1.MongoClient(url);
-    await client.connect();
-    const db = client.db(dbName ?? 'merkle-tree');
+const MongoDBTreeStorageFactory = async (db, prefix, collection) => {
     const collectionInstance = db.collection(collection ?? 'merkle-tree');
-    return tree_storage_1.MongoDBStorage.setup(prefix, collectionInstance);
+    return tree_storage_1.MongoDBTreeStorage.setup(prefix, collectionInstance);
 };
-exports.MongoDBStorageFactory = MongoDBStorageFactory;
+exports.MongoDBTreeStorageFactory = MongoDBTreeStorageFactory;
 //# sourceMappingURL=data-source-factory.js.map

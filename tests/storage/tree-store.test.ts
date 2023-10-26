@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { poseidon } from '@iden3/js-crypto';
-import { MongoDBStorageFactory } from '../../src/storage/data-source-factory';
+import { MongoDBTreeStorageFactory } from '../../src/storage/data-source-factory';
 import {
   bytes2Hex,
   bytesEqual,
@@ -19,15 +19,20 @@ import {
   ZERO_HASH
 } from '@iden3/js-merkletree';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Db, MongoClient } from 'mongodb';
 
-let mongodb: MongoMemoryServer;
+let db: Db;
 describe(`full test of the SMT library: mongodb`, () => {
   beforeEach(async () => {
-    mongodb = await MongoMemoryServer.create();
+    const mongodb = await MongoMemoryServer.create();
+
+    const client = new MongoClient(mongodb.getUri());
+    await client.connect();
+    db = client.db('mongodb-sdk-example');
   });
 
   const getTreeStorage = async (prefix = '', dbName?: string) => {
-    return MongoDBStorageFactory(str2Bytes(prefix), mongodb.getUri());
+    return MongoDBTreeStorageFactory(db, str2Bytes(prefix));
   };
 
   it('checks that the implementation of the db.Storage interface behaves as expected', async () => {

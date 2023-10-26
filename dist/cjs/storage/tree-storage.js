@@ -10,17 +10,17 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _MongoDBStorage_currentRoot;
+var _MongoDBTreeStorage_currentRoot;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MongoDBStorage = void 0;
+exports.MongoDBTreeStorage = void 0;
 const js_merkletree_1 = require("@iden3/js-merkletree");
-class MongoDBStorage {
+class MongoDBTreeStorage {
     constructor(_collection, _prefix, _prefixHash, currentRoot) {
         this._collection = _collection;
         this._prefix = _prefix;
         this._prefixHash = _prefixHash;
-        _MongoDBStorage_currentRoot.set(this, void 0);
-        __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, currentRoot, "f");
+        _MongoDBTreeStorage_currentRoot.set(this, void 0);
+        __classPrivateFieldSet(this, _MongoDBTreeStorage_currentRoot, currentRoot, "f");
     }
     static async setup(prefix, _collection) {
         const prefixHash = (0, js_merkletree_1.bytes2Hex)(prefix);
@@ -33,7 +33,7 @@ class MongoDBStorage {
         else {
             currentRoot = js_merkletree_1.ZERO_HASH;
         }
-        return new MongoDBStorage(_collection, prefix, prefixHash, currentRoot);
+        return new MongoDBTreeStorage(_collection, prefix, prefixHash, currentRoot);
     }
     async get(k) {
         const kBytes = new Uint8Array([...this._prefix, ...k]);
@@ -65,14 +65,14 @@ class MongoDBStorage {
         await this._collection.insertOne({ key: key, value: JSON.stringify(n) });
     }
     async getRoot() {
-        return __classPrivateFieldGet(this, _MongoDBStorage_currentRoot, "f");
+        return __classPrivateFieldGet(this, _MongoDBTreeStorage_currentRoot, "f");
     }
     async setRoot(r) {
         await this._collection.findOneAndDelete({ key: this._prefixHash });
         await this._collection.insertOne({ key: this._prefixHash, value: JSON.stringify(r) });
-        __classPrivateFieldSet(this, _MongoDBStorage_currentRoot, r, "f");
+        __classPrivateFieldSet(this, _MongoDBTreeStorage_currentRoot, r, "f");
     }
 }
-exports.MongoDBStorage = MongoDBStorage;
-_MongoDBStorage_currentRoot = new WeakMap();
+exports.MongoDBTreeStorage = MongoDBTreeStorage;
+_MongoDBTreeStorage_currentRoot = new WeakMap();
 //# sourceMappingURL=tree-storage.js.map

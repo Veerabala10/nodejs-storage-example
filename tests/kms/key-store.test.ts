@@ -2,12 +2,17 @@ import { expect } from 'chai';
 import { MongoDBPrivateKeyStore } from '../../src/kms/store/key-store';
 import { MongoDBPrivateKeyStoreFactory } from '../../src/kms/store/key-store-factory';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoClient } from 'mongodb';
 
 describe('Test MongoDB Data Source', () => {
   let keyStore: MongoDBPrivateKeyStore;
   beforeEach(async () => {
     const mongodb = await MongoMemoryServer.create();
-    keyStore = await MongoDBPrivateKeyStoreFactory(mongodb.getUri(), 'mongodb-key-store-example');
+    const client = new MongoClient(mongodb.getUri());
+    await client.connect();
+    const db = client.db('mongodb-sdk-example');
+
+    keyStore = await MongoDBPrivateKeyStoreFactory(db, 'mongodb-key-store-example');
   });
 
   it('Test all operations', async () => {

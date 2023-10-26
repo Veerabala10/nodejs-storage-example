@@ -3,24 +3,21 @@ import { expect } from 'chai';
 import { MongoDataSource } from '../../src/storage/data-source';
 import { MongoDataSourceFactory } from '../../src/storage/data-source-factory';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Hash, HASH_BYTES_LENGTH } from '@iden3/js-merkletree';
+import { MongoClient } from 'mongodb';
 
 describe('Test MongoDB Data Source', () => {
   let dbSource: MongoDataSource<Profile>;
   let dbSourceIdentity: MongoDataSource<Identity>;
   beforeEach(async () => {
     const mongodb = await MongoMemoryServer.create();
-    dbSource = await MongoDataSourceFactory(
-      mongodb.getUri(),
-      'mongodb-sdk-example',
-      'test-collection-profile'
-    );
 
-    dbSourceIdentity = await MongoDataSourceFactory(
-      mongodb.getUri(),
-      'mongodb-sdk-example',
-      'test-collection-identity'
-    );
+    const client = new MongoClient(mongodb.getUri());
+    await client.connect();
+    const db = client.db('mongodb-sdk-example');
+
+    dbSource = await MongoDataSourceFactory(db, 'test-collection-profile');
+
+    dbSourceIdentity = await MongoDataSourceFactory(db, 'test-collection-profile');
   });
 
   it('Test all operations', async () => {

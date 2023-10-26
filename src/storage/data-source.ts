@@ -15,7 +15,10 @@ export class MongoDataSource<Type extends Document> implements IDataSource<Type>
   public load(): Promise<Type[]> {
     return this._collection
       .find({})
-      .map((i) => {  delete (i as unknown as any)._id; return i as Type;} )
+      .map((i) => {
+        delete (i as unknown as any)._id;
+        return i as Type;
+      })
       .toArray();
   }
 

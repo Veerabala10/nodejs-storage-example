@@ -16,7 +16,10 @@ class MongoDataSource {
     load() {
         return this._collection
             .find({})
-            .map((i) => { delete i._id; return i; })
+            .map((i) => {
+            delete i._id;
+            return i;
+        })
             .toArray();
     }
     /**
