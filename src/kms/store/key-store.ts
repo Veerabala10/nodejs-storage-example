@@ -36,4 +36,14 @@ export class MongoDBPrivateKeyStore implements AbstractPrivateKeyStore {
     await this._collection.findOneAndDelete({ alias: args.alias });
     await this._collection.insertOne({ alias: args.alias, key: args.key });
   }
+
+  /**
+   * Retrieves a list of key aliases and their corresponding keys from the collection.
+   *
+   * @returns {Promise<{ alias: string; key: string }[]>} A promise that resolves to an array of objects,
+   * each containing an alias and a key.
+   */
+  list(): Promise<{ alias: string; key: string }[]> {
+    return this._collection.find().toArray();
+  }
 }
